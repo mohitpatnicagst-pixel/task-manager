@@ -1,74 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Task Manager</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+<!-- Login -->
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
 
-<!-- TOP BAR -->
-<div class="topbar">
-  <div class="logo">TaskManager</div>
-  <div class="user">Admin</div>
-</div>
-
-<!-- MAIN LAYOUT -->
-<div class="container">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <ul>
-      <li class="active">Dashboard</li>
-      <li>My Tasks</li>
-      <li>Assigned Tasks</li>
-      <li>Calendar</li>
-      <li>Reports</li>
-      <li>Settings</li>
-    </ul>
-  </aside>
-
-  <!-- CONTENT -->
-  <main class="content">
-
-    <h1>Dashboard</h1>
-
-    <!-- STATS CARDS -->
-    <div class="cards">
-      <div class="card purple">
-        <h3>Total Tasks</h3>
-        <p id="totalTasks">0</p>
-      </div>
-      <div class="card green">
-        <h3>Completed</h3>
-        <p id="completedTasks">0</p>
-      </div>
-      <div class="card red">
-        <h3>Overdue</h3>
-        <p>0</p>
-      </div>
-      <div class="card yellow">
-        <h3>Upcoming</h3>
-        <p>0</p>
-      </div>
-    </div>
-
-    <!-- ADD TASK -->
-    <div class="task-box">
-      <h2>Add New Task</h2>
-      <input type="text" id="taskInput" placeholder="Enter task title">
-      <button onclick="addTask()">Add Task</button>
-    </div>
-
-    <!-- TASK LIST -->
-    <div class="task-list">
-      <h2>Task List</h2>
-      <ul id="taskList"></ul>
-    </div>
-
-  </main>
-</div>
-
-<script src="script.js"></script>
-</body>
-</html>
+<!-- Signup -->
+<input id="su_username" placeholder="New Username">
+<input id="su_password" type="password" placeholder="New Password">
+<button onclick="signup()">Create Account</button>
