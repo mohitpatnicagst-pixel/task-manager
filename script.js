@@ -1,14 +1,11 @@
 const API = "https://task-manager-backend-bh60.onrender.com";
+let userId = null;
 
-let currentUser = null;
-
-// DOM
 const loginBox = document.getElementById("loginBox");
 const signupBox = document.getElementById("signupBox");
 const app = document.getElementById("app");
 const taskList = document.getElementById("taskList");
 
-// ---------- UI SWITCH ----------
 function showSignup() {
   loginBox.style.display = "none";
   signupBox.style.display = "block";
@@ -19,100 +16,93 @@ function showLogin() {
   loginBox.style.display = "block";
 }
 
-// ---------- SIGNUP ----------
 async function signup() {
-  const username = signupUsername.value.trim();
-  const password = signupPassword.value.trim();
-
-  const res = await fetch(API + "/signup", {
+  await fetch(API + "/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({
+      username: signupUsername.value,
+      password: signupPassword.value
+    })
   });
-
-  const data = await res.json();
-  alert(data.message || "Account created");
+  alert("Account created");
   showLogin();
 }
 
-// ---------- LOGIN ----------
 async function login() {
-  const username = loginUsername.value.trim();
-  const password = loginPassword.value.trim();
-
-  const res = await fetch(API + "/login", {
+  const r = await fetch(API + "/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({
+      username: loginUsername.value,
+      password: loginPassword.value
+    })
   });
 
-  const data = await res.json();
+  const d = await r.json();
+  if (!d.success) return alert("Invalid login");
 
-  if (data.success) {
-    currentUser = data.user;
-    localStorage.setItem("user", JSON.stringify(currentUser));
-    loginBox.style.display = "none";
-    app.style.display = "block";
-    loadTasks();
-  } else {
-    alert("Invalid credentials");
-  }
+  userId = d.userId;
+  loginBox.style.display = "none";
+  app.style.display = "block";
+  loadDashboard();
 }
 
-// ---------- LOGOUT ----------
-function logout() {
-  localStorage.removeItem("user");
-  location.reload();
+async function loadDashboard() {
+  const r = await fetch(API + "/tasks/" + userId);
+  const tasks = await r.json();
+  renderTasks(tasks);
+  updateCards(tasks);
 }
 
-// ---------- LOAD TASKS ----------
-async function loadTasks() {
+function renderTasks(tasks) {
   taskList.innerHTML = "";
-
-  const res = await fetch(`${API}/tasks/${currentUser.id}`);
-  const tasks = await res.json();
-
-  tasks.forEach(task => {
+  tasks.forEach(t => {
     const li = document.createElement("li");
     li.innerHTML = `
-      ${task.completed ? "✅" : "⬜"} ${task.title}
-      <button onclick="deleteTask(${task.id})">❌</button>
+      <input type="checkbox" ${t.completed ? "checked" : ""} 
+        onclick="completeTask(${t.id})">
+      ${t.title}
+      <button onclick="deleteTask(${t.id})">❌</button>
     `;
     taskList.appendChild(li);
   });
 }
 
-// ---------- ADD TASK ----------
-async function addTask() {
-  const title = taskInput.value.trim();
-  if (!title) return;
+function updateCards(tasks) {
+  const today = new Date();
+  totalCount.innerText = tasks.length;
+  completedCount.innerText = tasks.filter(t => t.completed).length;
+  overdueCount.innerText = tasks.filter(t =>
+    !t.completed && new Date(t.due_date) < today).length;
+  upcomingCount.innerText = tasks.filter(t =>
+    new Date(t.due_date) >= today).length;
+}
 
+async function addTask() {
   await fetch(API + "/tasks", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      user_id: currentUser.id,
-      title
+      userId,
+      title: taskInput.value,
+      dueDate: dueDate.value
     })
   });
-
   taskInput.value = "";
-  loadTasks();
+  loadDashboard();
 }
 
-// ---------- DELETE TASK ----------
+async function completeTask(id) {
+  await fetch(API + "/tasks/" + id + "/complete", { method: "PUT" });
+  loadDashboard();
+}
+
 async function deleteTask(id) {
-  await fetch(`${API}/tasks/${id}`, { method: "DELETE" });
-  loadTasks();
+  await fetch(API + "/tasks/" + id, { method: "DELETE" });
+  loadDashboard();
 }
 
-// ---------- AUTO LOGIN ----------
-window.onload = () => {
-  const savedUser = localStorage.getItem("user");
-  if (savedUser) {
-    currentUser = JSON.parse(savedUser);
-    loginBox.style.display = "none";
-    app.style.display = "block";
-    loadTasks();
-  }
-};
+function logout() {
+  location.reload();
+}
