@@ -73,3 +73,8 @@ function addTask() {
   document.getElementById("taskList").appendChild(li);
   taskInput.value = "";
 }
+function logout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("loggedIn");
+  location.reload();
+}
