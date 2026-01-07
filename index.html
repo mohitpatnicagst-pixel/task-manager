@@ -1,59 +1,189 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Task Manager</title>
-<link href="https://fonts.googleapis.com/css?family=Inter" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
 <style>
-body{font-family:Inter;background:#f5f6fa;margin:0}
-.top{background:#5b2dde;color:#fff;padding:15px;font-size:20px}
-.card{background:#fff;padding:20px;border-radius:8px;width:360px;margin:40px auto}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.box{color:#fff;padding:15px;border-radius:8px}
+*{box-sizing:border-box;font-family:Inter}
+body{margin:0;background:#f4f6f9}
+
+/* TOP BAR */
+.topbar{
+  background:#5b2dde;
+  color:#fff;
+  padding:14px 25px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:20px;
+}
+
+/* LAYOUT */
+.container{
+  display:flex;
+  height:calc(100vh - 56px);
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:220px;
+  background:#fff;
+  padding:20px;
+  border-right:1px solid #e5e7eb;
+}
+.sidebar a{
+  display:block;
+  padding:10px;
+  margin-bottom:6px;
+  color:#333;
+  text-decoration:none;
+  border-radius:6px;
+}
+.sidebar a.active,
+.sidebar a:hover{
+  background:#ede9fe;
+  color:#5b2dde;
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  padding:25px;
+}
+
+/* CARDS */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
+}
+.card{
+  color:#fff;
+  padding:20px;
+  border-radius:10px;
+}
 .purple{background:#7c3aed}
 .green{background:#16a34a}
 .red{background:#dc2626}
 .orange{background:#f59e0b}
-button{width:100%;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:6px}
-input{width:100%;padding:8px;margin-bottom:10px}
-.task{display:flex;justify-content:space-between;background:#f1f5f9;padding:8px;margin-top:6px}
+
+.card h3{margin:0;font-size:16px}
+.card p{font-size:32px;margin:10px 0 0}
+
+/* TASK BOX */
+.task-box{
+  background:#fff;
+  margin-top:30px;
+  padding:20px;
+  border-radius:10px;
+}
+.task-box h3{margin-top:0}
+
+input{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border:1px solid #ccc;
+  border-radius:6px;
+}
+button{
+  padding:10px 16px;
+  background:#2563eb;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+button:hover{background:#1e4ed8}
+
+/* TASK LIST */
+.task{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#f1f5f9;
+  padding:10px;
+  margin-top:8px;
+  border-radius:6px;
+}
+
+/* AUTH */
+.auth{
+  max-width:360px;
+  margin:80px auto;
+  background:#fff;
+  padding:25px;
+  border-radius:10px;
+}
+.auth h2{text-align:center}
+.link{text-align:center;margin-top:10px}
+.link a{color:#2563eb;cursor:pointer}
 </style>
 </head>
+
 <body>
 
-<div class="top">TaskManager</div>
-
-<div class="card" id="loginBox">
-  <h3>Login</h3>
+<!-- LOGIN -->
+<div class="auth" id="loginBox">
+  <h2>Login</h2>
   <input id="loginUsername" placeholder="Username">
   <input id="loginPassword" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p><a onclick="showSignup()">Create account</a></p>
+  <button onclick="login()" style="width:100%">Login</button>
+  <div class="link">New user? <a onclick="showSignup()">Create account</a></div>
 </div>
 
-<div class="card" id="signupBox" style="display:none">
-  <h3>Signup</h3>
+<!-- SIGNUP -->
+<div class="auth" id="signupBox" style="display:none">
+  <h2>Create Account</h2>
   <input id="signupUsername">
   <input id="signupPassword" type="password">
-  <button onclick="signup()">Create</button>
-  <p><a onclick="showLogin()">Login</a></p>
+  <button onclick="signup()" style="width:100%">Sign Up</button>
+  <div class="link"><a onclick="showLogin()">Back to login</a></div>
 </div>
 
-<div class="card" id="app" style="display:none">
-  <h3>Task Dashboard <button onclick="logout()" style="float:right;background:red">Logout</button></h3>
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none">
 
-  <div class="grid">
-    <div class="box purple">Total <span id="total">0</span></div>
-    <div class="box green">Completed <span id="completed">0</span></div>
-    <div class="box red">Overdue <span id="overdue">0</span></div>
-    <div class="box orange">Upcoming <span id="upcoming">0</span></div>
+  <div class="topbar">
+    <div>TaskManager</div>
+    <div>Admin | <span style="cursor:pointer" onclick="logout()">Logout</span></div>
   </div>
 
-  <input id="taskInput" placeholder="Task title">
-  <input id="dueDate" type="date">
-  <button onclick="addTask()">Add Task</button>
+  <div class="container">
 
-  <div id="taskList"></div>
+    <div class="sidebar">
+      <a class="active">Dashboard</a>
+      <a>My Tasks</a>
+      <a>Assigned Tasks</a>
+      <a>Calendar</a>
+      <a>Reports</a>
+      <a>Settings</a>
+    </div>
+
+    <div class="main">
+      <h2>Dashboard</h2>
+
+      <div class="cards">
+        <div class="card purple"><h3>Total Tasks</h3><p id="total">0</p></div>
+        <div class="card green"><h3>Completed</h3><p id="completed">0</p></div>
+        <div class="card red"><h3>Overdue</h3><p id="overdue">0</p></div>
+        <div class="card orange"><h3>Upcoming</h3><p id="upcoming">0</p></div>
+      </div>
+
+      <div class="task-box">
+        <h3>Add New Task</h3>
+        <input id="taskInput" placeholder="Enter task title">
+        <input id="dueDate" type="date">
+        <button onclick="addTask()">Add Task</button>
+
+        <h3 style="margin-top:25px">Task List</h3>
+        <div id="taskList"></div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <script src="script.js"></script>
