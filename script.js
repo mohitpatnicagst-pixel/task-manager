@@ -1,26 +1,74 @@
-let total = 0;
-let completed = 0;
+const API_URL = "https://task-manager-backend-bh60.onrender.com";
+let token = localStorage.getItem("token") || "";
 
-function addTask() {
-  const input = document.getElementById("taskInput");
-  const text = input.value.trim();
-  if (!text) return;
+// ---------- AUTH ----------
+async function signup() {
+  const username = document.getElementById("su_username").value;
+  const password = document.getElementById("su_password").value;
 
-  const li = document.createElement("li");
-  li.innerText = text;
+  const res = await fetch(`${API_URL}/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
 
-  li.onclick = function () {
-    if (!this.classList.contains("done")) {
-      this.classList.add("done");
-      this.style.textDecoration = "line-through";
-      completed++;
-      document.getElementById("completedTasks").innerText = completed;
-    }
-  };
+  const data = await res.json();
+  alert(data.message || "Signup done");
+}
 
-  document.getElementById("taskList").appendChild(li);
-  input.value = "";
+async function login() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
-  total++;
-  document.getElementById("totalTasks").innerText = total;
+  const res = await fetch(`${API_URL}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
+
+  const data = await res.json();
+
+  if (data.token) {
+    localStorage.setItem("token", data.token);
+    token = data.token;
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    loadTasks();
+  } else {
+    alert("Login failed");
+  }
+}
+
+// ---------- TASKS ----------
+async function addTask() {
+  const title = document.getElementById("taskInput").value;
+  if (!title) return;
+
+  await fetch(`${API_URL}/tasks`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({ title })
+  });
+
+  document.getElementById("taskInput").value = "";
+  loadTasks();
+}
+
+async function loadTasks() {
+  const res = await fetch(`${API_URL}/tasks`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+
+  const tasks = await res.json();
+  const ul = document.getElementById("taskList");
+  ul.innerHTML = "";
+
+  tasks.forEach(t => {
+    const li = document.createElement("li");
+    li.innerText = t.title;
+    ul.appendChild(li);
+  });
 }
