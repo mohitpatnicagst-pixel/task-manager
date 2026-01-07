@@ -1,120 +1,111 @@
 const API = "https://task-manager-backend-bh60.onrender.com";
 
-/* =====================
-   DOM ELEMENTS
-===================== */
+let currentUserId = null;
+
+// DOM
 const loginBox = document.getElementById("loginBox");
 const signupBox = document.getElementById("signupBox");
 const app = document.getElementById("app");
 const taskList = document.getElementById("taskList");
 
-/* =====================
-   INITIAL STATE
-===================== */
-loginBox.style.display = "block";
-signupBox.style.display = "none";
-app.style.display = "none";
-
-/* =====================
-   SCREEN SWITCH
-===================== */
+// ==================
+// UI SWITCH
+// ==================
 function showSignup() {
   loginBox.style.display = "none";
   signupBox.style.display = "block";
-  app.style.display = "none";
 }
 
 function showLogin() {
   signupBox.style.display = "none";
   loginBox.style.display = "block";
-  app.style.display = "none";
 }
 
-/* =====================
-   SIGNUP
-===================== */
+// ==================
+// SIGNUP
+// ==================
 async function signup() {
-  const username = document.getElementById("signupUsername").value.trim();
-  const password = document.getElementById("signupPassword").value.trim();
+  const username = signupUsername.value.trim();
+  const password = signupPassword.value.trim();
 
-  if (!username || !password) {
-    alert("Username & password required");
-    return;
-  }
+  const res = await fetch(API + "/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
 
-  try {
-    const res = await fetch(API + "/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      alert("Account created successfully. Please login.");
-      showLogin();
-    } else {
-      alert(data.message || "Signup failed");
-    }
-  } catch (err) {
-    alert("Server error");
-  }
+  const data = await res.json();
+  alert(data.message);
+  showLogin();
 }
 
-/* =====================
-   LOGIN
-===================== */
+// ==================
+// LOGIN
+// ==================
 async function login() {
-  const username = document.getElementById("loginUsername").value.trim();
-  const password = document.getElementById("loginPassword").value.trim();
+  const username = loginUsername.value.trim();
+  const password = loginPassword.value.trim();
 
-  if (!username || !password) {
-    alert("Username & password required");
-    return;
-  }
+  const res = await fetch(API + "/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
 
-  try {
-    const res = await fetch(API + "/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
-    });
+  const data = await res.json();
 
-    const data = await res.json();
-
-    if (data.success === true) {
-      loginBox.style.display = "none";
-      signupBox.style.display = "none";
-      app.style.display = "block";
-    } else {
-      alert("Invalid credentials");
-    }
-  } catch (err) {
-    alert("Server error");
+  if (data.success) {
+    currentUserId = data.userId;
+    loginBox.style.display = "none";
+    app.style.display = "block";
+    loadTasks();
+  } else {
+    alert("Invalid credentials");
   }
 }
 
-/* =====================
-   LOGOUT
-===================== */
-function logout() {
-  app.style.display = "none";
-  loginBox.style.display = "block";
-}
-
-/* =====================
-   TASK (FRONTEND ONLY)
-===================== */
-function addTask() {
+// ==================
+// ADD TASK (DB)
+// ==================
+async function addTask() {
   const taskInput = document.getElementById("taskInput");
-  const text = taskInput.value.trim();
+  const title = taskInput.value.trim();
+  if (!title) return;
 
-  if (!text) return;
-
-  const li = document.createElement("li");
-  li.innerText = text;
-  taskList.appendChild(li);
+  await fetch(API + "/tasks", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: currentUserId,
+      title
+    })
+  });
 
   taskInput.value = "";
+  loadTasks();
+}
+
+// ==================
+// LOAD TASKS (DB)
+// ==================
+async function loadTasks() {
+  taskList.innerHTML = "";
+
+  const res = await fetch(API + "/tasks/" + currentUserId);
+  const tasks = await res.json();
+
+  tasks.forEach(task => {
+    const li = document.createElement("li");
+    li.innerText = task.title;
+    taskList.appendChild(li);
+  });
+}
+
+// ==================
+// LOGOUT
+// ==================
+function logout() {
+  currentUserId = null;
+  app.style.display = "none";
+  showLogin();
 }
