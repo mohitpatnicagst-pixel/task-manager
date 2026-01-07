@@ -7,13 +7,32 @@
 </head>
 <body>
 
+  <!-- LOGIN BOX -->
   <div class="login-box" id="loginBox">
     <h2>Login</h2>
     <input type="text" placeholder="Username" id="username">
     <input type="password" placeholder="Password">
     <button onclick="login()">Login</button>
+
+    <p style="text-align:center; margin-top:10px;">
+      New user?
+      <a href="#" onclick="showSignup()">Sign Up</a>
+    </p>
   </div>
 
+  <!-- SIGN UP BOX -->
+  <div class="login-box" id="signupBox" style="display:none;">
+    <h2>Sign Up</h2>
+    <input type="text" placeholder="New Username">
+    <input type="password" placeholder="New Password">
+    <button onclick="backToLogin()">Create Account</button>
+
+    <p style="text-align:center; margin-top:10px;">
+      <a href="#" onclick="backToLogin()">Back to Login</a>
+    </p>
+  </div>
+
+  <!-- APP DASHBOARD -->
   <div class="app" id="app" style="display:none;">
     <h1>Task Dashboard</h1>
 
