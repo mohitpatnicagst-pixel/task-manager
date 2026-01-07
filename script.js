@@ -1,26 +1,53 @@
-const API_URL = "https://task-manager-backend-bh60.onrender.com";
-let token = localStorage.getItem("token") || "";
+const API = "https://task-manager-backend-bh60.onrender.com";
 
-// ---------- AUTH ----------
-async function signup() {
-  const username = document.getElementById("su_username").value;
-  const password = document.getElementById("su_password").value;
+// DOM
+const loginBox = document.getElementById("loginBox");
+const signupBox = document.getElementById("signupBox");
+const app = document.getElementById("app");
 
-  const res = await fetch(`${API_URL}/signup`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
-  });
-
-  const data = await res.json();
-  alert(data.message || "Signup done");
+// SWITCH
+function showSignup() {
+  loginBox.style.display = "none";
+  signupBox.style.display = "block";
 }
 
-async function login() {
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+function showLogin() {
+  signupBox.style.display = "none";
+  loginBox.style.display = "block";
+}
 
-  const res = await fetch(`${API_URL}/login`, {
+// SIGNUP
+async function signup() {
+  const username = document.getElementById("signupUsername").value.trim();
+  const password = document.getElementById("signupPassword").value.trim();
+
+  if (!username || !password) {
+    alert("Username & password required");
+    return;
+  }
+
+  const res = await fetch(API + "/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
+
+  const data = await res.json();
+  alert(data.message || "Account created");
+  showLogin();
+}
+
+// LOGIN
+async function login() {
+  const username = document.getElementById("loginUsername").value.trim();
+  const password = document.getElementById("loginPassword").value.trim();
+
+  if (!username || !password) {
+    alert("Username & password required");
+    return;
+  }
+
+  const res = await fetch(API + "/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password })
@@ -28,47 +55,21 @@ async function login() {
 
   const data = await res.json();
 
-  if (data.token) {
-    localStorage.setItem("token", data.token);
-    token = data.token;
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    loadTasks();
+  if (data.success === true) {
+    loginBox.style.display = "none";
+    app.style.display = "block";
   } else {
-    alert("Login failed");
+    alert("Invalid credentials");
   }
 }
 
-// ---------- TASKS ----------
-async function addTask() {
-  const title = document.getElementById("taskInput").value;
-  if (!title) return;
+// TASK (frontend only)
+function addTask() {
+  const taskInput = document.getElementById("taskInput");
+  if (!taskInput.value) return;
 
-  await fetch(`${API_URL}/tasks`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify({ title })
-  });
-
-  document.getElementById("taskInput").value = "";
-  loadTasks();
-}
-
-async function loadTasks() {
-  const res = await fetch(`${API_URL}/tasks`, {
-    headers: { "Authorization": `Bearer ${token}` }
-  });
-
-  const tasks = await res.json();
-  const ul = document.getElementById("taskList");
-  ul.innerHTML = "";
-
-  tasks.forEach(t => {
-    const li = document.createElement("li");
-    li.innerText = t.title;
-    ul.appendChild(li);
-  });
+  const li = document.createElement("li");
+  li.innerText = taskInput.value;
+  document.getElementById("taskList").appendChild(li);
+  taskInput.value = "";
 }
