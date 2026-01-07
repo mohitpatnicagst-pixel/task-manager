@@ -1,5 +1,5 @@
 const API = "https://task-manager-backend-bh60.onrender.com";
-let userId = null;
+let userId=null;
 
 function showSignup(){loginBox.style.display="none";signupBox.style.display="block"}
 function showLogin(){signupBox.style.display="none";loginBox.style.display="block"}
@@ -16,10 +16,10 @@ async function login(){
   const res=await fetch(API+"/login",{method:"POST",headers:{"Content-Type":"application/json"},
   body:JSON.stringify({username:loginUsername.value,password:loginPassword.value})});
   const data=await res.json();
-  if(!data.success)return alert("Invalid");
+  if(!data.success)return alert("Invalid credentials");
   userId=data.userId;
   loginBox.style.display="none";
-  app.style.display="block";
+  dashboard.style.display="block";
   loadTasks();
 }
 
@@ -27,9 +27,15 @@ async function loadTasks(){
   const res=await fetch(API+"/tasks/"+userId);
   const tasks=await res.json();
   taskList.innerHTML="";
-  let c=0;
+  let completedCount=0;
+  const today=new Date().toISOString().slice(0,10);
+  let overdue=0, upcoming=0;
+
   tasks.forEach(t=>{
-    if(t.completed)c++;
+    if(t.completed) completedCount++;
+    else if(t.due_date < today) overdue++;
+    else upcoming++;
+
     taskList.innerHTML+=`
       <div class="task">
         <input type="checkbox" ${t.completed?"checked":""} onclick="toggle(${t.id})">
@@ -37,8 +43,11 @@ async function loadTasks(){
         <button onclick="del(${t.id})">❌</button>
       </div>`;
   });
+
   total.innerText=tasks.length;
-  completed.innerText=c;
+  completed.innerText=completedCount;
+  overdue.innerText=overdue;
+  upcoming.innerText=upcoming;
 }
 
 async function addTask(){
@@ -47,6 +56,5 @@ async function addTask(){
   taskInput.value="";
   loadTasks();
 }
-
 async function toggle(id){await fetch(API+"/tasks/"+id,{method:"PUT"});loadTasks()}
 async function del(id){await fetch(API+"/tasks/"+id,{method:"DELETE"});loadTasks()}
