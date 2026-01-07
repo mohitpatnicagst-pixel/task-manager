@@ -1,6 +1,6 @@
 const API = "https://task-manager-backend-bh60.onrender.com";
 
-let currentUserId = null;
+let currentUser = null;
 
 // DOM
 const loginBox = document.getElementById("loginBox");
@@ -8,9 +8,7 @@ const signupBox = document.getElementById("signupBox");
 const app = document.getElementById("app");
 const taskList = document.getElementById("taskList");
 
-// ==================
-// UI SWITCH
-// ==================
+// ---------- UI SWITCH ----------
 function showSignup() {
   loginBox.style.display = "none";
   signupBox.style.display = "block";
@@ -21,9 +19,7 @@ function showLogin() {
   loginBox.style.display = "block";
 }
 
-// ==================
-// SIGNUP
-// ==================
+// ---------- SIGNUP ----------
 async function signup() {
   const username = signupUsername.value.trim();
   const password = signupPassword.value.trim();
@@ -35,13 +31,11 @@ async function signup() {
   });
 
   const data = await res.json();
-  alert(data.message);
+  alert(data.message || "Account created");
   showLogin();
 }
 
-// ==================
-// LOGIN
-// ==================
+// ---------- LOGIN ----------
 async function login() {
   const username = loginUsername.value.trim();
   const password = loginPassword.value.trim();
@@ -55,7 +49,8 @@ async function login() {
   const data = await res.json();
 
   if (data.success) {
-    currentUserId = data.userId;
+    currentUser = data.user;
+    localStorage.setItem("user", JSON.stringify(currentUser));
     loginBox.style.display = "none";
     app.style.display = "block";
     loadTasks();
@@ -64,11 +59,31 @@ async function login() {
   }
 }
 
-// ==================
-// ADD TASK (DB)
-// ==================
+// ---------- LOGOUT ----------
+function logout() {
+  localStorage.removeItem("user");
+  location.reload();
+}
+
+// ---------- LOAD TASKS ----------
+async function loadTasks() {
+  taskList.innerHTML = "";
+
+  const res = await fetch(`${API}/tasks/${currentUser.id}`);
+  const tasks = await res.json();
+
+  tasks.forEach(task => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      ${task.completed ? "✅" : "⬜"} ${task.title}
+      <button onclick="deleteTask(${task.id})">❌</button>
+    `;
+    taskList.appendChild(li);
+  });
+}
+
+// ---------- ADD TASK ----------
 async function addTask() {
-  const taskInput = document.getElementById("taskInput");
   const title = taskInput.value.trim();
   if (!title) return;
 
@@ -76,7 +91,7 @@ async function addTask() {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      userId: currentUserId,
+      user_id: currentUser.id,
       title
     })
   });
@@ -85,27 +100,19 @@ async function addTask() {
   loadTasks();
 }
 
-// ==================
-// LOAD TASKS (DB)
-// ==================
-async function loadTasks() {
-  taskList.innerHTML = "";
-
-  const res = await fetch(API + "/tasks/" + currentUserId);
-  const tasks = await res.json();
-
-  tasks.forEach(task => {
-    const li = document.createElement("li");
-    li.innerText = task.title;
-    taskList.appendChild(li);
-  });
+// ---------- DELETE TASK ----------
+async function deleteTask(id) {
+  await fetch(`${API}/tasks/${id}`, { method: "DELETE" });
+  loadTasks();
 }
 
-// ==================
-// LOGOUT
-// ==================
-function logout() {
-  currentUserId = null;
-  app.style.display = "none";
-  showLogin();
-}
+// ---------- AUTO LOGIN ----------
+window.onload = () => {
+  const savedUser = localStorage.getItem("user");
+  if (savedUser) {
+    currentUser = JSON.parse(savedUser);
+    loginBox.style.display = "none";
+    app.style.display = "block";
+    loadTasks();
+  }
+};
