@@ -20,23 +20,22 @@
     }
 
     .card {
-      width: 360px;
+      width: 420px;
       background: #fff;
       padding: 25px;
-      border-radius: 8px;
+      border-radius: 10px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       display: none;
     }
 
     h2 {
-      text-align: center;
-      margin-bottom: 20px;
+      margin: 0;
     }
 
     input {
       width: 100%;
       padding: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
     }
@@ -49,7 +48,7 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 15px;
+      font-size: 14px;
     }
 
     button:hover {
@@ -68,11 +67,7 @@
       text-decoration: underline;
     }
 
-    /* DASHBOARD */
-    #app {
-      width: 420px;
-    }
-
+    /* HEADER */
     .header {
       display: flex;
       justify-content: space-between;
@@ -91,18 +86,55 @@
       background: #b91c1c;
     }
 
+    /* DASHBOARD CARDS */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .stat {
+      padding: 12px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .stat span {
+      display: block;
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+
+    .total { background: #6366f1; }
+    .completed { background: #16a34a; }
+    .overdue { background: #dc2626; }
+    .upcoming { background: #ea580c; }
+
     ul {
       list-style: none;
       padding: 0;
-      margin-top: 15px;
+      margin-top: 10px;
     }
 
     li {
       background: #f1f5f9;
-      padding: 8px 10px;
+      padding: 8px;
       margin-bottom: 6px;
-      border-radius: 4px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       font-size: 14px;
+    }
+
+    li button {
+      width: auto;
+      background: #dc2626;
+      padding: 4px 8px;
+      font-size: 12px;
     }
   </style>
 </head>
@@ -111,9 +143,9 @@
 
   <!-- LOGIN -->
   <div class="card" id="loginBox" style="display:block">
-    <h2>Login</h2>
-    <input id="loginUsername" placeholder="Username" />
-    <input id="loginPassword" type="password" placeholder="Password" />
+    <h2 style="text-align:center;margin-bottom:15px;">Login</h2>
+    <input id="loginUsername" placeholder="Username">
+    <input id="loginPassword" type="password" placeholder="Password">
     <button onclick="login()">Login</button>
     <p class="link">
       New user? <a onclick="showSignup()">Create account</a>
@@ -122,9 +154,9 @@
 
   <!-- SIGNUP -->
   <div class="card" id="signupBox">
-    <h2>Create Account</h2>
-    <input id="signupUsername" placeholder="Username" />
-    <input id="signupPassword" type="password" placeholder="Password" />
+    <h2 style="text-align:center;margin-bottom:15px;">Create Account</h2>
+    <input id="signupUsername" placeholder="Username">
+    <input id="signupPassword" type="password" placeholder="Password">
     <button onclick="signup()">Sign Up</button>
     <p class="link">
       Already have account? <a onclick="showLogin()">Login</a>
@@ -138,9 +170,20 @@
       <button class="logout" onclick="logout()">Logout</button>
     </div>
 
-    <input id="taskInput" placeholder="New task" />
+    <!-- DASHBOARD STATS -->
+    <div class="cards">
+      <div class="stat total">Total Tasks <span id="totalCount">0</span></div>
+      <div class="stat completed">Completed <span id="completedCount">0</span></div>
+      <div class="stat overdue">Overdue <span id="overdueCount">0</span></div>
+      <div class="stat upcoming">Upcoming <span id="upcomingCount">0</span></div>
+    </div>
+
+    <!-- ADD TASK -->
+    <input id="taskInput" placeholder="Task title">
+    <input type="date" id="dueDate">
     <button onclick="addTask()">Add Task</button>
 
+    <!-- TASK LIST -->
     <ul id="taskList"></ul>
   </div>
 
