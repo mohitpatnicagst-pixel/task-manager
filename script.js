@@ -1,41 +1,26 @@
-// LOGIN FUNCTION (Demo)
-function login() {
-  document.getElementById("loginBox").style.display = "none";
-  document.getElementById("signupBox").style.display = "none";
-  document.getElementById("app").style.display = "block";
-}
+let total = 0;
+let completed = 0;
 
-// SHOW SIGNUP FORM
-function showSignup() {
-  document.getElementById("loginBox").style.display = "none";
-  document.getElementById("signupBox").style.display = "block";
-  document.getElementById("app").style.display = "none";
-}
-
-// BACK TO LOGIN FROM SIGNUP
-function backToLogin() {
-  alert("Signup successful (demo only)");
-  document.getElementById("signupBox").style.display = "none";
-  document.getElementById("loginBox").style.display = "block";
-  document.getElementById("app").style.display = "none";
-}
-
-// ADD TASK FUNCTION
 function addTask() {
-  const taskInput = document.getElementById("taskInput");
-  const taskText = taskInput.value.trim();
-
-  if (taskText === "") return;
+  const input = document.getElementById("taskInput");
+  const text = input.value.trim();
+  if (!text) return;
 
   const li = document.createElement("li");
-  li.innerText = taskText;
+  li.innerText = text;
 
-  // click to mark complete
   li.onclick = function () {
-    this.style.textDecoration = "line-through";
-    this.style.opacity = "0.6";
+    if (!this.classList.contains("done")) {
+      this.classList.add("done");
+      this.style.textDecoration = "line-through";
+      completed++;
+      document.getElementById("completedTasks").innerText = completed;
+    }
   };
 
   document.getElementById("taskList").appendChild(li);
-  taskInput.value = "";
+  input.value = "";
+
+  total++;
+  document.getElementById("totalTasks").innerText = total;
 }
