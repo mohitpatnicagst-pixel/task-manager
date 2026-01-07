@@ -7,43 +7,68 @@
 </head>
 <body>
 
-  <!-- LOGIN BOX -->
-  <div class="login-box" id="loginBox">
-    <h2>Login</h2>
-    <input type="text" placeholder="Username" id="username">
-    <input type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">TaskManager</div>
+  <div class="user">Admin</div>
+</div>
 
-    <p style="text-align:center; margin-top:10px;">
-      New user?
-      <a href="#" onclick="showSignup()">Sign Up</a>
-    </p>
-  </div>
+<!-- MAIN LAYOUT -->
+<div class="container">
 
-  <!-- SIGN UP BOX -->
-  <div class="login-box" id="signupBox" style="display:none;">
-    <h2>Sign Up</h2>
-    <input type="text" placeholder="New Username">
-    <input type="password" placeholder="New Password">
-    <button onclick="backToLogin()">Create Account</button>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <ul>
+      <li class="active">Dashboard</li>
+      <li>My Tasks</li>
+      <li>Assigned Tasks</li>
+      <li>Calendar</li>
+      <li>Reports</li>
+      <li>Settings</li>
+    </ul>
+  </aside>
 
-    <p style="text-align:center; margin-top:10px;">
-      <a href="#" onclick="backToLogin()">Back to Login</a>
-    </p>
-  </div>
+  <!-- CONTENT -->
+  <main class="content">
 
-  <!-- APP DASHBOARD -->
-  <div class="app" id="app" style="display:none;">
-    <h1>Task Dashboard</h1>
+    <h1>Dashboard</h1>
 
-    <div class="task-form">
-      <input type="text" id="taskInput" placeholder="Enter new task">
+    <!-- STATS CARDS -->
+    <div class="cards">
+      <div class="card purple">
+        <h3>Total Tasks</h3>
+        <p id="totalTasks">0</p>
+      </div>
+      <div class="card green">
+        <h3>Completed</h3>
+        <p id="completedTasks">0</p>
+      </div>
+      <div class="card red">
+        <h3>Overdue</h3>
+        <p>0</p>
+      </div>
+      <div class="card yellow">
+        <h3>Upcoming</h3>
+        <p>0</p>
+      </div>
+    </div>
+
+    <!-- ADD TASK -->
+    <div class="task-box">
+      <h2>Add New Task</h2>
+      <input type="text" id="taskInput" placeholder="Enter task title">
       <button onclick="addTask()">Add Task</button>
     </div>
 
-    <ul id="taskList"></ul>
-  </div>
+    <!-- TASK LIST -->
+    <div class="task-list">
+      <h2>Task List</h2>
+      <ul id="taskList"></ul>
+    </div>
 
-  <script src="script.js"></script>
+  </main>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
